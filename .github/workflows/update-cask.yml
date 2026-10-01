@@ -1,0 +1,106 @@
+name: Update Tethered cask
+
+on:
+  schedule:
+    - cron: "17 9 * * *"
+  workflow_dispatch:
+  push:
+    paths:
+      - .github/workflows/update-cask.yml
+
+permissions:
+  contents: write
+
+concurrency:
+  group: update-tethered-cask
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAP_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Verify release and update cask
+        shell: python
+        run: |
+          import base64
+          import hashlib
+          import json
+          import os
+          import re
+          import urllib.request
+
+          token = os.environ["GH_TOKEN"]
+          repository = os.environ["TAP_REPOSITORY"]
+          if repository != "Tumerit/homebrew-tap":
+              raise SystemExit("This workflow only updates the official Tumerit tap")
+
+          def api(path, payload=None):
+              headers = {
+                  "Accept": "application/vnd.github+json",
+                  "Authorization": "Bearer " + token,
+                  "X-GitHub-Api-Version": "2022-11-28",
+                  "User-Agent": "tethered-cask-updater",
+              }
+              data = None if payload is None else json.dumps(payload).encode()
+              request = urllib.request.Request(
+                  "https://api.github.com/" + path,
+                  data=data,
+                  headers=headers,
+                  method="GET" if payload is None else "PUT",
+              )
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.load(response)
+
+          release = api("repos/Tumerit/Tethered/releases/latest")
+          if release["draft"] or release["prerelease"]:
+              raise SystemExit("Only published stable releases are supported")
+          match = re.fullmatch(r"v(\d+\.\d+\.\d+)", release["tag_name"])
+          if not match:
+              raise SystemExit("Expected a stable release tag such as v1.0.1")
+          version = match.group(1)
+          record = api("repos/" + repository + "/contents/Casks/tethered.rb?ref=main")
+          content = base64.b64decode(record["content"]).decode()
+          current = re.search(r'^  version "(\d+\.\d+\.\d+)"$', content, re.M)
+          if not current:
+              raise SystemExit("Cannot read the current cask version")
+          version_tuple = lambda value: tuple(map(int, value.split(".")))
+          if version_tuple(version) <= version_tuple(current.group(1)):
+              print("Cask is current; no changes needed")
+              raise SystemExit(0)
+
+          filename = "Tethered-" + version + ".pkg"
+          assets = [asset for asset in release["assets"] if asset["name"] == filename]
+          if len(assets) != 1 or assets[0]["state"] != "uploaded":
+              raise SystemExit("Expected exactly one completed installer asset: " + filename)
+          asset = assets[0]
+          url = "https://github.com/Tumerit/Tethered/releases/download/v" + version + "/" + filename
+          if asset["browser_download_url"] != url:
+              raise SystemExit("Installer URL does not match the official release")
+          checksum = hashlib.sha256()
+          size = 0
+          with urllib.request.urlopen(url, timeout=60) as response:
+              while chunk := response.read(1024 * 1024):
+                  checksum.update(chunk)
+                  size += len(chunk)
+          digest = checksum.hexdigest()
+          if size != asset["size"] or size == 0:
+              raise SystemExit("Installer download size mismatch")
+          if asset.get("digest") and asset["digest"] != "sha256:" + digest:
+              raise SystemExit("Installer checksum differs from GitHub's asset digest")
+          updated, count = re.subn(r'^  version "[^"\n]+"$', '  version "' + version + '"', content, flags=re.M)
+          if count != 1:
+              raise SystemExit("Expected one version field")
+          updated, count = re.subn(r'^  sha256 "[a-f0-9]{64}"$', '  sha256 "' + digest + '"', updated, flags=re.M)
+          if count != 1:
+              raise SystemExit("Expected one checksum field")
+          result = api("repos/" + repository + "/contents/Casks/tethered.rb", {
+              "message": "Update Tethered to " + version,
+              "content": base64.b64encode(updated.encode()).decode(),
+              "sha": record["sha"],
+              "branch": "main",
+          })
+          print("Updated Tethered to " + version + ": " + result["commit"]["html_url"])
