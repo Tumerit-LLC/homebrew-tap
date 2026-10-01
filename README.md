@@ -19,4 +19,8 @@ For complete removal of generated alert helpers, use Tethered's built-in Uninsta
 
 ## Updating the cask
 
-Publish a new versioned installer in the Tumerit/Tethered GitHub releases. Update `version` and `sha256` in `Casks/tethered.rb` together. Calculate the SHA-256 from the published download, verify its installer signature and notarization, and check the bundled minimum macOS version and helper launchd label. Do not replace a published installer without updating the checksum.
+GitHub Actions checks the latest stable Tumerit/Tethered release daily at 09:17 UTC. Publish a tag such as `v1.0.1` with a completed asset named `Tethered-1.0.1.pkg`. The bot downloads the installer, verifies its size and GitHub asset digest when available, then commits the new version and SHA-256 to the cask. Drafts, prereleases, and older versions are skipped.
+
+To update sooner, open Actions → Update Tethered cask → Run workflow. Failed runs are visible in Actions. Do not replace an existing release asset; publish a new version instead.
+
+The bot updates only the version and checksum. Changes to minimum macOS support, installer naming, or the helper launchd label require a cask edit. Continue signing and notarizing each installer before publishing it; this workflow does not verify Apple notarization.
