@@ -1,6 +1,6 @@
 cask "tethered" do
-  version "1.2.4"
-  sha256 "91dd7866452ef8de83aad6ce168edc93807b3819c24d54c7c42368b80b7479d6"
+  version "1.2.5"
+  sha256 "f939403c365f28961b13180fe9d60222c21ea61f9608aa4fe37d683f9b06c9f5"
 
 
   url "https://github.com/Tumerit/Tethered/releases/download/v#{version}/Tethered-#{version}.pkg",
@@ -16,7 +16,7 @@ cask "tethered" do
   pkg "Tethered-#{version}.pkg"
 
 
-  uninstall launchctl: "com.Tumerit.Tethered.helper.10000",
+  uninstall launchctl: "com.Tumerit.Tethered.helper.12025",
             quit:      "com.Tumerit.Tethered",
             pkgutil:   "com.Tumerit.Tethered.installer",
             delete:    "/Applications/Tethered.app"
