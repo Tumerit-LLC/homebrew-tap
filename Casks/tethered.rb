@@ -1,6 +1,6 @@
 cask "tethered" do
-  version "1.2.5"
-  sha256 "f939403c365f28961b13180fe9d60222c21ea61f9608aa4fe37d683f9b06c9f5"
+  version "1.2.6"
+  sha256 "ed49d038196511b60dbd545549879282a03e0edf64de7edce365c412ead262b2"
 
 
   url "https://github.com/Tumerit-LLC/Tethered/releases/download/v#{version}/Tethered-#{version}.pkg",
