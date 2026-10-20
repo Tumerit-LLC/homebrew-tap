@@ -3,8 +3,8 @@ cask "tethered" do
   sha256 "f939403c365f28961b13180fe9d60222c21ea61f9608aa4fe37d683f9b06c9f5"
 
 
-  url "https://github.com/Tumerit/Tethered/releases/download/v#{version}/Tethered-#{version}.pkg",
-      verified: "github.com/Tumerit/Tethered/"
+  url "https://github.com/Tumerit-LLC/Tethered/releases/download/v#{version}/Tethered-#{version}.pkg",
+      verified: "github.com/Tumerit-LLC/Tethered/"
   name "Tethered"
   desc "Battery and power management for Mac"
   homepage "https://www.tetheredmac.com/"

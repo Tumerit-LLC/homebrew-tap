@@ -3,7 +3,7 @@
 Install [Tethered](https://www.tetheredmac.com/), a battery and power management app for Mac:
 
 ```sh
-brew install --cask Tumerit/tap/tethered
+brew install --cask Tumerit-LLC/tap/tethered
 ```
 
 Requires macOS 15 or later. Supports Intel and Apple Silicon.
@@ -11,8 +11,8 @@ Requires macOS 15 or later. Supports Intel and Apple Silicon.
 Installation uses the official signed and notarized installer and requires administrator authentication. The installer opens Tethered after installation. Its optional privacy-permission reset is not selected by default.
 
 ```sh
-brew upgrade --cask Tumerit/tap/tethered
-brew uninstall --cask Tumerit/tap/tethered
+brew upgrade --cask Tumerit-LLC/tap/tethered
+brew uninstall --cask Tumerit-LLC/tap/tethered
 ```
 
 For complete removal of generated alert helpers, use Tethered's built-in Uninstall action before removing the Homebrew cask. Local preferences and account data are preserved by the cask.

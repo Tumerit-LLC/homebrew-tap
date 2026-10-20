@@ -35,7 +35,7 @@ jobs:
 
           token = os.environ["GH_TOKEN"]
           repository = os.environ["TAP_REPOSITORY"]
-          if repository != "Tumerit/homebrew-tap":
+          if repository != "Tumerit-LLC/homebrew-tap":
               raise SystemExit("This workflow only updates the official Tumerit tap")
 
           def api(path, payload=None):
@@ -55,7 +55,7 @@ jobs:
               with urllib.request.urlopen(request, timeout=60) as response:
                   return json.load(response)
 
-          release = api("repos/Tumerit/Tethered/releases/latest")
+          release = api("repos/Tumerit-LLC/Tethered/releases/latest")
           if release["draft"] or release["prerelease"]:
               raise SystemExit("Only published stable releases are supported")
           match = re.fullmatch(r"v(\d+\.\d+\.\d+)", release["tag_name"])
@@ -77,7 +77,7 @@ jobs:
           if len(assets) != 1 or assets[0]["state"] != "uploaded":
               raise SystemExit("Expected exactly one completed installer asset: " + filename)
           asset = assets[0]
-          url = "https://github.com/Tumerit/Tethered/releases/download/v" + version + "/" + filename
+          url = "https://github.com/Tumerit-LLC/Tethered/releases/download/v" + version + "/" + filename
           if asset["browser_download_url"] != url:
               raise SystemExit("Installer URL does not match the official release")
           checksum = hashlib.sha256()
