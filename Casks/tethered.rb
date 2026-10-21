@@ -1,9 +1,9 @@
 cask "tethered" do
-  version "1.2.6"
-  sha256 "ed49d038196511b60dbd545549879282a03e0edf64de7edce365c412ead262b2"
+  version "1.2.7"
+  sha256 "8ccef866b012255e284c1710b3b3f54f91f455bcfa99c97cbff8f5ca7b3039f3"
 
 
-  url "https://github.com/Tumerit-LLC/Tethered/releases/download/v#{version}/Tethered-#{version}.pkg",
+  url "https://github.com/Tumerit-LLC/Tethered/releases/download/v#{version}/Tethered-#{version}.zip",
       verified: "github.com/Tumerit-LLC/Tethered/"
   name "Tethered"
   desc "Battery and power management for Mac"
@@ -13,7 +13,9 @@ cask "tethered" do
   depends_on macos: :sequoia
 
 
-  pkg "Tethered-#{version}.pkg"
+  container nested: "Tethered-#{version}.dmg"
+
+  app "\u200B.app", target: "Tethered.app"
 
 
   uninstall launchctl: "com.Tumerit.Tethered.helper.12025",
